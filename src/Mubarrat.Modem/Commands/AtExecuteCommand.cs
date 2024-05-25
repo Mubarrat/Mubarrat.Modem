@@ -11,4 +11,6 @@ public class AtExecuteCommand : AtCommand
     /// </summary>
     /// <param name="command">The raw AT command string for execution.</param>
     public AtExecuteCommand(string command) : base(command) { }
+
+    protected override string Suffix => "";
 }

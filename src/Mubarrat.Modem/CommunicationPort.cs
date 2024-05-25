@@ -1,4 +1,7 @@
-﻿namespace Mubarrat.Modem;
+﻿using System.Text;
+using System.Threading;
+
+namespace Mubarrat.Modem;
 
 /// <summary>
 /// This class provides functionality to manage communication through a serial port for sending and receiving data.
@@ -34,7 +37,8 @@ public class CommunicationPort : ICommunicationPort
         WriteTimeout = settings.WriteTimeout,
         ReadTimeout = settings.ReadTimeout,
         DtrEnable = settings.DtrEnable,
-        RtsEnable = settings.RtsEnable
+        RtsEnable = settings.RtsEnable,
+        Encoding = Encoding.GetEncoding("iso-8859-1")
     };
 
     /// <inheritdoc/>
@@ -164,7 +168,15 @@ public class CommunicationPort : ICommunicationPort
             throw new InvalidOperationException("The serial port is not currently open.");
         try
         {
+            DiscardBuffer();
             port.WriteLine(data);
+            while (port.BytesToRead == 0) ;
+            int prevBytes = port.BytesToRead - 1;
+            while (prevBytes != port.BytesToRead)
+            {
+                prevBytes = port.BytesToRead;
+                Thread.Sleep(1);
+            }
             return new(data);
         }
         catch (Exception ex)
@@ -180,11 +192,29 @@ public class CommunicationPort : ICommunicationPort
     /// <exception cref="IOException">Thrown if an error occurs while sending data through the serial port.</exception>
     /// <exception cref="TaskCanceledException">The task has been canceled.</exception>
     /// <exception cref="ObjectDisposedException">The <see cref="CancellationTokenSource"/> associated with <paramref name="cancellationToken"/> was disposed.</exception>
-    public Task<SentData> SendDataAsync(string data, CancellationToken cancellationToken = default)
+    public async Task<SentData> SendDataAsync(string data, CancellationToken cancellationToken = default)
     {
         if (cancellationToken.IsCancellationRequested)
             throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
-        return Task.Run(() => SendData(data), cancellationToken);
+        try
+        {
+            if (!cancellationToken.IsCancellationRequested)
+                DiscardBuffer();
+            if (!cancellationToken.IsCancellationRequested)
+                port.WriteLine(data);
+            while (cancellationToken.IsCancellationRequested && port.BytesToRead == 0) ;
+            int prevBytes = port.BytesToRead - 1;
+            while (!cancellationToken.IsCancellationRequested && prevBytes != port.BytesToRead)
+            {
+                prevBytes = port.BytesToRead;
+                await Task.Delay(1, cancellationToken);
+            }
+            return new(data);
+        }
+        catch (Exception ex)
+        {
+            return new(ex);
+        }
     }
 
     /// <inheritdoc/>
@@ -193,18 +223,50 @@ public class CommunicationPort : ICommunicationPort
     {
         if (!IsOpen)
             throw new InvalidOperationException("The serial port is not currently open.");
-        return new(port.ReadExisting().Trim().Replace("\r\n\r\n", Environment.NewLine));
+        string serialPortData = string.Empty;
+        try
+        {
+            do
+            {
+                Thread.Sleep(5);
+                serialPortData += port.ReadExisting();
+            }
+            while (!serialPortData.EndsWith("\r\nOK\r\n") &&
+             !serialPortData.EndsWith("\r\n> ") && !serialPortData.EndsWith("\r\nERROR\r\n"));
+        }
+        catch (Exception ex)
+        {
+            return new(ex);
+        }
+        return new(serialPortData.Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine));
     }
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">Thrown if the port is not open.</exception>
     /// <exception cref="TaskCanceledException">The task has been canceled.</exception>
     /// <exception cref="ObjectDisposedException">The <see cref="CancellationTokenSource"/> associated with <paramref name="cancellationToken"/> was disposed.</exception>
-    public Task<ReceivedData> ReceiveDataAsync(CancellationToken cancellationToken = default)
+    public async Task<ReceivedData> ReceiveDataAsync(CancellationToken cancellationToken = default)
     {
         if (cancellationToken.IsCancellationRequested)
             throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
-        return Task.Run(ReceiveData, cancellationToken);
+        string serialPortData = string.Empty;
+        try
+        {
+            do
+            {
+                if (!cancellationToken.IsCancellationRequested)
+                    await Task.Delay(5, cancellationToken);
+                if (!cancellationToken.IsCancellationRequested)
+                    serialPortData += port.ReadExisting();
+            }
+            while (!cancellationToken.IsCancellationRequested && !serialPortData.EndsWith("\r\nOK\r\n") &&
+             !serialPortData.EndsWith("\r\n> ") && !serialPortData.EndsWith("\r\nERROR\r\n"));
+        }
+        catch (Exception ex)
+        {
+            return new(ex);
+        }
+        return new(serialPortData.Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine));
     }
 
     /// <inheritdoc/>
@@ -217,13 +279,6 @@ public class CommunicationPort : ICommunicationPort
         if (!IsOpen)
             throw new InvalidOperationException("The serial port is not currently open.");
         SentData sent = SendData(data);
-        while (port.BytesToRead == 0);
-        int prevBytes = port.BytesToRead - 1;
-        while (prevBytes != port.BytesToRead)
-        {
-            prevBytes = port.BytesToRead;
-            Thread.Sleep(1);
-        }
         ReceivedData receivedData = ReceiveData();
         receivedData.InnerData = sent;
         return receivedData;
@@ -243,15 +298,6 @@ public class CommunicationPort : ICommunicationPort
         if (!IsOpen)
             throw new InvalidOperationException("The serial port is not currently open.");
         SentData sent = await SendDataAsync(data, cancellationToken);
-        while (!cancellationToken.IsCancellationRequested && port.BytesToRead == 0) ;
-        if (cancellationToken.IsCancellationRequested)
-            return new(new OperationCanceledException(cancellationToken), sent);
-        int prevBytes = port.BytesToRead - 1;
-        while (!cancellationToken.IsCancellationRequested && prevBytes != port.BytesToRead)
-        {
-            prevBytes = port.BytesToRead;
-            await Task.Delay(1, cancellationToken);
-        }
         ReceivedData receivedData = await ReceiveDataAsync(cancellationToken);
         receivedData.InnerData = sent;
         return receivedData;

@@ -15,10 +15,5 @@ public class AtTestCommand : AtCommand
     /// <param name="command">The raw AT command string for testing.</param>
     public AtTestCommand(string command) : base(command) { }
 
-    /// <summary>
-    /// Overrides the ToString() method to return the complete AT command string with a trailing question mark (?),
-    /// potentially indicating a test or query operation.
-    /// </summary>
-    /// <returns>The complete AT command string with a trailing question mark.</returns>
-    public override string ToString() => $"AT{Command}=?";
+    protected override string Suffix => "=?";
 }

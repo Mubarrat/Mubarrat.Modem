@@ -18,10 +18,5 @@ public class AtSetCommand : AtCommand
     /// </summary>
     public DataValue[] Data { get; set; }
 
-    /// <summary>
-    /// Overrides the <see cref="object.ToString"/> method to return the complete AT command string with the data values
-    /// joined by commas and prefixed with an equal sign (=).
-    /// </summary>
-    /// <returns>The complete AT command string for setting a value.</returns>
-    public override string ToString() => $"{base.ToString()}={string.Join(",", (IEnumerable<DataValue>)Data)}";
+    protected override string Suffix => $"={string.Join(",", (IEnumerable<DataValue>)Data)}";
 }

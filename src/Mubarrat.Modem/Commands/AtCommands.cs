@@ -17,5 +17,5 @@ public class AtCommands : List<AtCommand>
     /// from all the AtCommand objects in the list.
     /// </summary>
     /// <returns>A combined AT command string with commands separated by semicolons (;).</returns>
-    public override string ToString() => "AT" + string.Join(";", this.Select(x => new string(x.ToString().Skip(2).ToArray())));
+    public override string ToString() => "AT" + string.Join(";", this.Select(x => x.WithoutPrefixString));
 }

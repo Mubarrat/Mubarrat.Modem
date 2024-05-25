@@ -14,11 +14,10 @@ public class AtCommandPort : CommunicationPort, IAtCommandPort
     /// <exception cref="ArgumentNullException">An <see cref="ArgumentNullException"/> if <paramref name="portName"/> is null.</exception>
     public AtCommandPort(string portName) : base(new()
     {
-        WriteBufferSize = 524288,
-        ReadBufferSize = 524288,
+        WriteBufferSize = 4096,
+        ReadBufferSize = 2097152,
         PortName = portName ?? throw new ArgumentNullException(nameof(portName)),
         BaudRate = 115200,
-        Handshake = Handshake.XOnXOff,
         DtrEnable = true,
         RtsEnable = true,
         NewLine = Environment.NewLine
