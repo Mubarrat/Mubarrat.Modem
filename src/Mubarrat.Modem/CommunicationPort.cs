@@ -196,6 +196,8 @@ public class CommunicationPort : ICommunicationPort
     {
         if (cancellationToken.IsCancellationRequested)
             throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
+        if (!IsOpen)
+            throw new InvalidOperationException("The serial port is not currently open.");
         try
         {
             if (!cancellationToken.IsCancellationRequested)
@@ -215,6 +217,42 @@ public class CommunicationPort : ICommunicationPort
         {
             return new(ex);
         }
+    }
+
+    public string SendRequest(string data)
+    {
+        if (!IsOpen)
+            throw new InvalidOperationException("The serial port is not currently open.");
+        DiscardBuffer();
+        port.WriteLine(data);
+        while (port.BytesToRead == 0) ;
+        int prevBytes = port.BytesToRead - 1;
+        while (prevBytes != port.BytesToRead)
+        {
+            prevBytes = port.BytesToRead;
+            Thread.Sleep(1);
+        }
+        return data;
+    }
+
+    public async Task<string> SendRequestAsync(string data, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
+        if (!IsOpen)
+            throw new InvalidOperationException("The serial port is not currently open.");
+        if (!cancellationToken.IsCancellationRequested)
+            DiscardBuffer();
+        if (!cancellationToken.IsCancellationRequested)
+            port.WriteLine(data);
+        while (cancellationToken.IsCancellationRequested && port.BytesToRead == 0) ;
+        int prevBytes = port.BytesToRead - 1;
+        while (!cancellationToken.IsCancellationRequested && prevBytes != port.BytesToRead)
+        {
+            prevBytes = port.BytesToRead;
+            await Task.Delay(1, cancellationToken);
+        }
+        return data;
     }
 
     /// <inheritdoc/>
@@ -249,6 +287,8 @@ public class CommunicationPort : ICommunicationPort
     {
         if (cancellationToken.IsCancellationRequested)
             throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
+        if (!IsOpen)
+            throw new InvalidOperationException("The serial port is not currently open.");
         string serialPortData = string.Empty;
         try
         {
@@ -267,6 +307,40 @@ public class CommunicationPort : ICommunicationPort
             return new(ex);
         }
         return new(serialPortData.Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine));
+    }
+
+    public string? ReceiveResponse()
+    {
+        if (!IsOpen)
+            throw new InvalidOperationException("The serial port is not currently open.");
+        string serialPortData = string.Empty;
+        do
+        {
+            Thread.Sleep(5);
+            serialPortData += port.ReadExisting();
+        }
+        while (!serialPortData.EndsWith("\r\nOK\r\n") &&
+            !serialPortData.EndsWith("\r\n> ") && !serialPortData.EndsWith("\r\nERROR\r\n"));
+        return serialPortData.Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
+    }
+
+    public async Task<string?> ReceiveResponseAsync(CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
+        if (!IsOpen)
+            throw new InvalidOperationException("The serial port is not currently open.");
+        string serialPortData = string.Empty;
+        do
+        {
+            if (!cancellationToken.IsCancellationRequested)
+                await Task.Delay(5, cancellationToken);
+            if (!cancellationToken.IsCancellationRequested)
+                serialPortData += port.ReadExisting();
+        }
+        while (!cancellationToken.IsCancellationRequested && !serialPortData.EndsWith("\r\nOK\r\n") &&
+            !serialPortData.EndsWith("\r\n> ") && !serialPortData.EndsWith("\r\nERROR\r\n"));
+        return serialPortData.Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
     }
 
     /// <inheritdoc/>
@@ -301,5 +375,22 @@ public class CommunicationPort : ICommunicationPort
         ReceivedData receivedData = await ReceiveDataAsync(cancellationToken);
         receivedData.InnerData = sent;
         return receivedData;
+    }
+
+    public string? GetResponse(string data)
+    {
+        SendRequest(data);
+        return ReceiveResponse();
+    }
+
+    public async Task<string?> GetResponseAsync(string data, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
+        if (!cancellationToken.IsCancellationRequested)
+            await SendRequestAsync(data, cancellationToken);
+        if (!cancellationToken.IsCancellationRequested)
+            return await ReceiveResponseAsync(cancellationToken);
+        return null;
     }
 }

@@ -23,9 +23,9 @@ public class AtCommandPort : CommunicationPort, IAtCommandPort
         NewLine = Environment.NewLine
     }) { }
 
-    public string? SendCommand(AtCommand command) => GetData(command.ToString()).Message;
+    public string? SendCommand(AtCommand command) => GetResponse(command.ToString());
 
-    public async Task<string?> SendCommandAsync(AtCommand command, CancellationToken cancellationToken = default) => (await GetDataAsync(command.ToString(), cancellationToken)).Message;
+    public async Task<string?> SendCommandAsync(AtCommand command, CancellationToken cancellationToken = default) => await GetResponseAsync(command.ToString(), cancellationToken);
 
     public string? SendCommands(params AtCommand[] commands) => SendCommands(new AtCommands(commands));
 
@@ -33,9 +33,9 @@ public class AtCommandPort : CommunicationPort, IAtCommandPort
 
     public Task<string?> SendCommandsAsync(CancellationToken cancellationToken, params AtCommand[] commands) => SendCommandsAsync(new AtCommands(commands), cancellationToken);
 
-    public string? SendCommands(AtCommands commands) => GetData(commands.ToString()).Message;
+    public string? SendCommands(AtCommands commands) => GetResponse(commands.ToString());
 
-    public async Task<string?> SendCommandsAsync(AtCommands commands, CancellationToken cancellationToken = default) => (await GetDataAsync(commands.ToString(), cancellationToken)).Message;
+    public async Task<string?> SendCommandsAsync(AtCommands commands, CancellationToken cancellationToken = default) => await GetResponseAsync(commands.ToString(), cancellationToken);
 
     public string? TestCommand(string commandName) => SendCommand(new AtTestCommand(commandName));
 

@@ -14,6 +14,13 @@ public interface ISyncCommunicationPort : ISyncSerialPort
     public SentData SendData(string data);
 
     /// <summary>
+    /// Sends the specified data through the communication port synchronously.
+    /// </summary>
+    /// <param name="data">The string data to send.</param>
+    /// <returns>A <see cref="string"/> containing information about the request.</returns>
+    public string SendRequest(string data);
+
+    /// <summary>
     /// Receives data from the communication port synchronously.
     /// May wait for data if none is currently available.
     /// </summary>
@@ -21,11 +28,25 @@ public interface ISyncCommunicationPort : ISyncSerialPort
     public ReceivedData ReceiveData();
 
     /// <summary>
-    /// Sends the specified data and retrieves the response from the communication port synchronously.
+    /// Receives response from the communication port synchronously.
+    /// May wait for response if none is currently available.
+    /// </summary>
+    /// <returns>A <see cref="string"/> containing received response, or null if no response is available.</returns>
+    public string? ReceiveResponse();
+
+    /// <summary>
+    /// Sends the specified data and retrieves the data from the communication port synchronously.
     /// </summary>
     /// <param name="data">The string data to send.</param>
     /// <returns>A <see cref="ReceivedData"/> object containing information about sent data and the received response, or null if no response is expected.</returns>
     public ReceivedData GetData(string data);
+
+    /// <summary>
+    /// Sends the specified request and retrieves the response from the communication port synchronously.
+    /// </summary>
+    /// <param name="data">The string data to send.</param>
+    /// <returns>A <see cref="string"/> containing received response, or null if no response is available.</returns>
+    public string? GetResponse(string data);
 
     /// <summary>
     /// Attempts to open the serial port for communication.

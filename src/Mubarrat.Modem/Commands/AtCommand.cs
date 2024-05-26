@@ -31,4 +31,24 @@ public abstract class AtCommand : IAtCommand
     /// Similar to the ToString() method but returns the incomplete AT command string no prefixed.
     /// </summary>
     public string WithoutPrefixString => $"{Command}{Suffix}";
+
+    /// <summary>
+    /// Creates a new instance of <see cref="AtCommand"/> by given <paramref name="atCommandType"/>
+    /// </summary>
+    /// <param name="atCommandType">The type of the <see cref="AtCommand"/>.</param>
+    /// <param name="command">The command of the <see cref="AtCommand"/></param>
+    /// <param name="parameters">If you set <paramref name="atCommandType"/> = <see cref="AtCommandType.Set"/>, it will be defined. Otherwise ignored.</param>
+    /// <returns>Returns the new instance of <see cref="AtCommand"/> that was created.</returns>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="atCommandType"/> isn't valid.</exception>
+    public static AtCommand CreateInstance(AtCommandType atCommandType, string command, params DataValue[] parameters)
+    {
+        return atCommandType switch
+        {
+            AtCommandType.Test => new AtTestCommand(command),
+            AtCommandType.Read => new AtReadCommand(command),
+            AtCommandType.Set => new AtSetCommand(command, parameters),
+            AtCommandType.Execute => new AtExecuteCommand(command),
+            _ => throw new ArgumentException("Invalid enum given", nameof(atCommandType)),
+        };
+    }
 }

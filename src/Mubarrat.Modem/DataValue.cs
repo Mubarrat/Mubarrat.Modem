@@ -38,4 +38,8 @@ public class DataValue : IDataValue
     string IDataValue.UnevaluatedString() => UnevaluatedString();
 
     string IDataValue.UnevaluatedInteger() => UnevaluatedInteger();
+
+    public static implicit operator DataValue(string value) => new(value);
+
+    public static implicit operator DataValue(int value) => new(value);
 }
