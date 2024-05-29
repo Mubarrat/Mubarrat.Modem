@@ -6,7 +6,7 @@ namespace Mubarrat.Modem;
 /// This interface defines asynchronous methods for interacting with a modem using AT commands.
 /// It inherits from <see cref="IAsyncCommunicationPort"/> to handle the underlying asynchronous serial communication.
 /// </summary>
-public interface IAsyncAtCommandPort : IAsyncCommunicationPort
+public interface IAsyncAtCommandPort : IAsyncCommunicationPort, IEquatable<IAsyncAtCommandPort>
 {
     /// <summary>
     /// Asynchronously sends a single AT command to the modem.

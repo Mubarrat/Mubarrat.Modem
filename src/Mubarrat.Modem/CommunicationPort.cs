@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using System.Threading;
+using static System.Environment;
 
 namespace Mubarrat.Modem;
 
@@ -12,7 +12,9 @@ public class CommunicationPort : ICommunicationPort
     /// <summary>
     /// The underlying <see cref="SerialPort" /> object used for communication.
     /// </summary>
-    private readonly SerialPort port;
+    protected readonly SerialPort port;
+
+    protected bool currentlyReceiving;
 
     public bool IsOpen => port.IsOpen;
 
@@ -47,7 +49,7 @@ public class CommunicationPort : ICommunicationPort
     /// <exception cref="UnauthorizedAccessException">Thrown if the application doesn't have sufficient permissions to access the serial port.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if one of the arguments passed to the OpenAsync method is invalid (e.g., invalid port name or baud rate).</exception>
     /// <exception cref="NotSupportedException">Thrown if the underlying system doesn't support the requested operation (e.g., specific serial port functionality or configuration not supported by the OS or hardware).</exception>
-    public void Open() { if (!IsOpen) port.Open(); }
+    public virtual void Open() { if (!IsOpen) port.Open(); }
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">Thrown if the port is already open.</exception>
@@ -59,7 +61,7 @@ public class CommunicationPort : ICommunicationPort
 
     /// <inheritdoc/>
     /// <exception cref="IOException">Thrown if there's an error closing the port.</exception>
-    public void Close() { if (IsOpen) port.Close(); }
+    public virtual void Close() { if (IsOpen) port.Close(); }
 
     /// <inheritdoc/>
     /// <exception cref="IOException">Thrown if there's an error closing the port.</exception>
@@ -159,72 +161,27 @@ public class CommunicationPort : ICommunicationPort
 
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException">Thrown if the data parameter is null.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the data string is empty (depending on implementation).</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the data string is empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the port is not open.</exception>
     /// <exception cref="IOException">Thrown if an error occurs while sending data through the serial port.</exception>
-    public SentData SendData(string data)
-    {
-        if (!IsOpen)
-            throw new InvalidOperationException("The serial port is not currently open.");
-        try
-        {
-            DiscardBuffer();
-            port.WriteLine(data);
-            while (port.BytesToRead == 0) ;
-            int prevBytes = port.BytesToRead - 1;
-            while (prevBytes != port.BytesToRead)
-            {
-                prevBytes = port.BytesToRead;
-                Thread.Sleep(1);
-            }
-            return new(data);
-        }
-        catch (Exception ex)
-        {
-            return new(ex);
-        }
-    }
+    public SentData SendData(string data) => new(SendRequest(data));
 
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException">Thrown if the data parameter is null.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the data string is empty (depending on implementation).</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the data string is empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the port is not open.</exception>
     /// <exception cref="IOException">Thrown if an error occurs while sending data through the serial port.</exception>
     /// <exception cref="TaskCanceledException">The task has been canceled.</exception>
     /// <exception cref="ObjectDisposedException">The <see cref="CancellationTokenSource"/> associated with <paramref name="cancellationToken"/> was disposed.</exception>
-    public async Task<SentData> SendDataAsync(string data, CancellationToken cancellationToken = default)
-    {
-        if (cancellationToken.IsCancellationRequested)
-            throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
-        if (!IsOpen)
-            throw new InvalidOperationException("The serial port is not currently open.");
-        try
-        {
-            if (!cancellationToken.IsCancellationRequested)
-                DiscardBuffer();
-            if (!cancellationToken.IsCancellationRequested)
-                port.WriteLine(data);
-            while (cancellationToken.IsCancellationRequested && port.BytesToRead == 0) ;
-            int prevBytes = port.BytesToRead - 1;
-            while (!cancellationToken.IsCancellationRequested && prevBytes != port.BytesToRead)
-            {
-                prevBytes = port.BytesToRead;
-                await Task.Delay(1, cancellationToken);
-            }
-            return new(data);
-        }
-        catch (Exception ex)
-        {
-            return new(ex);
-        }
-    }
+    public async Task<SentData> SendDataAsync(string data, CancellationToken cancellationToken = default) => new(await SendRequestAsync(data, cancellationToken));
 
     public string SendRequest(string data)
     {
         if (!IsOpen)
             throw new InvalidOperationException("The serial port is not currently open.");
         DiscardBuffer();
-        port.WriteLine(data);
+        byte[] dataBytes = port.Encoding.GetBytes(data + port.NewLine);
+        port.BaseStream.Write(dataBytes, 0, dataBytes.Length);
         while (port.BytesToRead == 0) ;
         int prevBytes = port.BytesToRead - 1;
         while (prevBytes != port.BytesToRead)
@@ -237,18 +194,18 @@ public class CommunicationPort : ICommunicationPort
 
     public async Task<string> SendRequestAsync(string data, CancellationToken cancellationToken = default)
     {
-        if (cancellationToken.IsCancellationRequested)
-            throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
         if (!IsOpen)
             throw new InvalidOperationException("The serial port is not currently open.");
-        if (!cancellationToken.IsCancellationRequested)
-            DiscardBuffer();
-        if (!cancellationToken.IsCancellationRequested)
-            port.WriteLine(data);
-        while (cancellationToken.IsCancellationRequested && port.BytesToRead == 0) ;
+        await DiscardBufferAsync(cancellationToken);
+        byte[] dataBytes = port.Encoding.GetBytes(data + port.NewLine);
+        cancellationToken.ThrowIfCancellationRequested();
+        await port.BaseStream.WriteAsync(dataBytes, 0, dataBytes.Length, cancellationToken);
+        while (port.BytesToRead == 0)
+            cancellationToken.ThrowIfCancellationRequested();
         int prevBytes = port.BytesToRead - 1;
-        while (!cancellationToken.IsCancellationRequested && prevBytes != port.BytesToRead)
+        while (prevBytes != port.BytesToRead)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             prevBytes = port.BytesToRead;
             await Task.Delay(1, cancellationToken);
         }
@@ -257,95 +214,77 @@ public class CommunicationPort : ICommunicationPort
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">Thrown if the port is not open.</exception>
-    public ReceivedData ReceiveData()
-    {
-        if (!IsOpen)
-            throw new InvalidOperationException("The serial port is not currently open.");
-        string serialPortData = string.Empty;
-        try
-        {
-            do
-            {
-                Thread.Sleep(5);
-                serialPortData += port.ReadExisting();
-            }
-            while (!serialPortData.EndsWith("\r\nOK\r\n") &&
-             !serialPortData.EndsWith("\r\n> ") && !serialPortData.EndsWith("\r\nERROR\r\n"));
-        }
-        catch (Exception ex)
-        {
-            return new(ex);
-        }
-        return new(serialPortData.Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine));
-    }
+    public ReceivedData ReceiveData() => new(ReceiveResponse());
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">Thrown if the port is not open.</exception>
     /// <exception cref="TaskCanceledException">The task has been canceled.</exception>
     /// <exception cref="ObjectDisposedException">The <see cref="CancellationTokenSource"/> associated with <paramref name="cancellationToken"/> was disposed.</exception>
-    public async Task<ReceivedData> ReceiveDataAsync(CancellationToken cancellationToken = default)
-    {
-        if (cancellationToken.IsCancellationRequested)
-            throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
-        if (!IsOpen)
-            throw new InvalidOperationException("The serial port is not currently open.");
-        string serialPortData = string.Empty;
-        try
-        {
-            do
-            {
-                if (!cancellationToken.IsCancellationRequested)
-                    await Task.Delay(5, cancellationToken);
-                if (!cancellationToken.IsCancellationRequested)
-                    serialPortData += port.ReadExisting();
-            }
-            while (!cancellationToken.IsCancellationRequested && !serialPortData.EndsWith("\r\nOK\r\n") &&
-             !serialPortData.EndsWith("\r\n> ") && !serialPortData.EndsWith("\r\nERROR\r\n"));
-        }
-        catch (Exception ex)
-        {
-            return new(ex);
-        }
-        return new(serialPortData.Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine));
-    }
+    public async Task<ReceivedData> ReceiveDataAsync(CancellationToken cancellationToken = default) => new(await ReceiveResponseAsync(cancellationToken));
 
     public string? ReceiveResponse()
     {
         if (!IsOpen)
             throw new InvalidOperationException("The serial port is not currently open.");
-        string serialPortData = string.Empty;
-        do
+        currentlyReceiving = true;
+        StringBuilder responseBuilder = new();
+        try
         {
-            Thread.Sleep(5);
-            serialPortData += port.ReadExisting();
+            byte[] buffer = new byte[1024];
+            do
+            {
+                int bytesRead = port.BaseStream.Read(buffer, 0, buffer.Length);
+                if (bytesRead > 0)
+                    responseBuilder.Append(port.Encoding.GetString(buffer, 0, bytesRead));
+            }
+            while (!CheckResponseReceived(responseBuilder.ToString()));
+            return responseBuilder.ToString().Trim().Replace(NewLine + NewLine, NewLine);
         }
-        while (!serialPortData.EndsWith("\r\nOK\r\n") &&
-            !serialPortData.EndsWith("\r\n> ") && !serialPortData.EndsWith("\r\nERROR\r\n"));
-        return serialPortData.Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
+        finally
+        {
+            currentlyReceiving = false;
+        }
     }
 
     public async Task<string?> ReceiveResponseAsync(CancellationToken cancellationToken = default)
     {
-        if (cancellationToken.IsCancellationRequested)
-            throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
         if (!IsOpen)
             throw new InvalidOperationException("The serial port is not currently open.");
-        string serialPortData = string.Empty;
-        do
+        currentlyReceiving = true;
+        StringBuilder responseBuilder = new();
+        try
         {
-            if (!cancellationToken.IsCancellationRequested)
-                await Task.Delay(5, cancellationToken);
-            if (!cancellationToken.IsCancellationRequested)
-                serialPortData += port.ReadExisting();
+            cancellationToken.ThrowIfCancellationRequested();
+            byte[] buffer = new byte[1024];
+            do
+            {
+                int bytesRead = await port.BaseStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (bytesRead > 0)
+                    responseBuilder.Append(port.Encoding.GetString(buffer, 0, bytesRead));
+            }
+            while (!cancellationToken.IsCancellationRequested &&
+                   !CheckResponseReceived(responseBuilder.ToString()));
+            return responseBuilder.ToString().Trim().Replace(NewLine + NewLine, NewLine);
         }
-        while (!cancellationToken.IsCancellationRequested && !serialPortData.EndsWith("\r\nOK\r\n") &&
-            !serialPortData.EndsWith("\r\n> ") && !serialPortData.EndsWith("\r\nERROR\r\n"));
-        return serialPortData.Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
+        finally
+        {
+            currentlyReceiving = false;
+        }
     }
+
+    private static readonly string[] ValidEndings =
+    [
+        $"{NewLine}OK{NewLine}",
+        $"{NewLine}> ",
+        $"{NewLine}ERROR{NewLine}"
+    ];
+
+    private bool CheckResponseReceived(string response) => ValidEndings.Any(response.EndsWith);
 
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException">Thrown if the data parameter is null.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the data string is empty (depending on implementation).</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the data string is empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the port is not open.</exception>
     /// <exception cref="IOException">Thrown if an error occurs while sending data through the serial port.</exception>
     public ReceivedData GetData(string data)
@@ -360,15 +299,13 @@ public class CommunicationPort : ICommunicationPort
 
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException">Thrown if the data parameter is null.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the data string is empty (depending on implementation).</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the data string is empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the port is not open.</exception>
     /// <exception cref="IOException">Thrown if an error occurs while sending data through the serial port.</exception>
     /// <exception cref="TaskCanceledException">The task has been canceled.</exception>
     /// <exception cref="ObjectDisposedException">The <see cref="CancellationTokenSource"/> associated with <paramref name="cancellationToken"/> was disposed.</exception>
     public async Task<ReceivedData> GetDataAsync(string data, CancellationToken cancellationToken = default)
     {
-        if (cancellationToken.IsCancellationRequested)
-            throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
         if (!IsOpen)
             throw new InvalidOperationException("The serial port is not currently open.");
         SentData sent = await SendDataAsync(data, cancellationToken);
@@ -385,12 +322,19 @@ public class CommunicationPort : ICommunicationPort
 
     public async Task<string?> GetResponseAsync(string data, CancellationToken cancellationToken = default)
     {
-        if (cancellationToken.IsCancellationRequested)
-            throw new ArgumentException("Cancellation token already cancelled.", nameof(cancellationToken));
-        if (!cancellationToken.IsCancellationRequested)
-            await SendRequestAsync(data, cancellationToken);
-        if (!cancellationToken.IsCancellationRequested)
-            return await ReceiveResponseAsync(cancellationToken);
-        return null;
+        await SendRequestAsync(data, cancellationToken);
+        return await ReceiveResponseAsync(cancellationToken);
     }
+
+    public bool Equals(ISerialPort other) => this == other;
+
+    public bool Equals(ISyncSerialPort other) => this == other;
+
+    public bool Equals(IAsyncSerialPort other) => this == other;
+
+    public bool Equals(ISyncCommunicationPort other) => this == other;
+
+    public bool Equals(IAsyncCommunicationPort other) => this == other;
+
+    public bool Equals(ICommunicationPort other) => this == other;
 }

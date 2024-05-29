@@ -5,7 +5,7 @@ namespace Mubarrat.Modem;
 /// <summary>
 /// This class provides a low-level interface for interacting with a modem using AT commands.
 /// </summary>
-public class AtCommandPort : CommunicationPort, IAtCommandPort
+public class AtCommandPort : ObservableCommunicationPort, IAtCommandPort
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="AtCommandPort"/> class for low-level communication on the specified serial port.
@@ -25,7 +25,7 @@ public class AtCommandPort : CommunicationPort, IAtCommandPort
 
     public string? SendCommand(AtCommand command) => GetResponse(command.ToString());
 
-    public async Task<string?> SendCommandAsync(AtCommand command, CancellationToken cancellationToken = default) => await GetResponseAsync(command.ToString(), cancellationToken);
+    public Task<string?> SendCommandAsync(AtCommand command, CancellationToken cancellationToken = default) => GetResponseAsync(command.ToString(), cancellationToken);
 
     public string? SendCommands(params AtCommand[] commands) => SendCommands(new AtCommands(commands));
 
@@ -35,7 +35,7 @@ public class AtCommandPort : CommunicationPort, IAtCommandPort
 
     public string? SendCommands(AtCommands commands) => GetResponse(commands.ToString());
 
-    public async Task<string?> SendCommandsAsync(AtCommands commands, CancellationToken cancellationToken = default) => await GetResponseAsync(commands.ToString(), cancellationToken);
+    public Task<string?> SendCommandsAsync(AtCommands commands, CancellationToken cancellationToken = default) => GetResponseAsync(commands.ToString(), cancellationToken);
 
     public string? TestCommand(string commandName) => SendCommand(new AtTestCommand(commandName));
 
@@ -54,4 +54,10 @@ public class AtCommandPort : CommunicationPort, IAtCommandPort
     public string? ExecuteCommand(string commandName) => SendCommand(new AtExecuteCommand(commandName));
 
     public Task<string?> ExecuteCommandAsync(string commandName, CancellationToken cancellationToken = default) => SendCommandAsync(new AtExecuteCommand(commandName), cancellationToken);
+
+    public bool Equals(ISyncAtCommandPort other) => this == other;
+
+    public bool Equals(IAsyncAtCommandPort other) => this == other;
+
+    public bool Equals(IAtCommandPort other) => this == other;
 }

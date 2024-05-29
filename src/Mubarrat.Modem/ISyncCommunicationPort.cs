@@ -4,7 +4,7 @@
 /// Defines an interface for advanced communication port operations on top of the basic <see cref="ISyncSerialPort" /> functionality.
 /// Provides synchronous methods for synchronous data sending, receiving, and response retrieval.
 /// </summary>
-public interface ISyncCommunicationPort : ISyncSerialPort
+public interface ISyncCommunicationPort : ISyncSerialPort, IEquatable<ISyncCommunicationPort>
 {
     /// <summary>
     /// Sends the specified data through the communication port synchronously.

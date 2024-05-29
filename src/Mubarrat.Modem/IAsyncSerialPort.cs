@@ -5,7 +5,7 @@
 /// Provides asynchronous methods for managing the port state, discarding buffers,
 /// and potentially additional communication-specific operations.
 /// </summary>
-public interface IAsyncSerialPort : IDisposable
+public interface IAsyncSerialPort : IDisposable, IEquatable<IAsyncSerialPort>
 {
     /// <summary>
     /// Asynchronously opens the serial port for communication.

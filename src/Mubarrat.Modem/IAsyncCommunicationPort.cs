@@ -4,7 +4,7 @@
 /// Defines an interface for advanced communication port operations on top of the basic <see cref="IAsyncSerialPort" /> functionality.
 /// Provides asynchronous methods for asynchronous data sending, receiving, and response retrieval.
 /// </summary>
-public interface IAsyncCommunicationPort : IAsyncSerialPort
+public interface IAsyncCommunicationPort : IAsyncSerialPort, IEquatable<IAsyncCommunicationPort>
 {
     /// <summary>
     /// Sends the specified data string through the communication port asynchronously.

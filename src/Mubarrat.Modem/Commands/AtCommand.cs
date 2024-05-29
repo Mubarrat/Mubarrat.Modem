@@ -40,15 +40,12 @@ public abstract class AtCommand : IAtCommand
     /// <param name="parameters">If you set <paramref name="atCommandType"/> = <see cref="AtCommandType.Set"/>, it will be defined. Otherwise ignored.</param>
     /// <returns>Returns the new instance of <see cref="AtCommand"/> that was created.</returns>
     /// <exception cref="ArgumentException">Thrown if <paramref name="atCommandType"/> isn't valid.</exception>
-    public static AtCommand CreateInstance(AtCommandType atCommandType, string command, params DataValue[] parameters)
+    public static AtCommand CreateInstance(AtCommandType atCommandType, string command, params DataValue[] parameters) => atCommandType switch
     {
-        return atCommandType switch
-        {
-            AtCommandType.Test => new AtTestCommand(command),
-            AtCommandType.Read => new AtReadCommand(command),
-            AtCommandType.Set => new AtSetCommand(command, parameters),
-            AtCommandType.Execute => new AtExecuteCommand(command),
-            _ => throw new ArgumentException("Invalid enum given", nameof(atCommandType)),
-        };
-    }
+        AtCommandType.Test => new AtTestCommand(command),
+        AtCommandType.Read => new AtReadCommand(command),
+        AtCommandType.Set => new AtSetCommand(command, parameters),
+        AtCommandType.Execute => new AtExecuteCommand(command),
+        _ => throw new ArgumentException("Invalid enum given", nameof(atCommandType)),
+    };
 }

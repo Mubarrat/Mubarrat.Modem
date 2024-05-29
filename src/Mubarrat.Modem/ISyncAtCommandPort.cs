@@ -6,7 +6,7 @@ namespace Mubarrat.Modem;
 /// This interface defines synchronous methods for interacting with a modem using AT commands.
 /// It inherits from <see cref="ISyncCommunicationPort"/> to handle the underlying synchronous serial communication.
 /// </summary>
-public interface ISyncAtCommandPort : ISyncCommunicationPort
+public interface ISyncAtCommandPort : ISyncCommunicationPort, IEquatable<ISyncAtCommandPort>
 {
     /// <summary>
     /// Sends a single AT command to the modem.

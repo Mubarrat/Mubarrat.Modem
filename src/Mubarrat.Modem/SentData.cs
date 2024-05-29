@@ -12,14 +12,7 @@ public class SentData : Data
     /// the data sent and the success of the operation.
     /// </summary>
     /// <param name="message">The message containing the data that was sent.</param>
-    public SentData(string message) : base(message) { }
-
-    /// <summary>
-    /// Initializes a new instance of the SendData class with an exception 
-    /// indicating a failure during data transmission.
-    /// </summary>
-    /// <param name="exception">The exception object representing the error that occurred.</param>
-    public SentData(Exception exception) : base(exception) { }
+    public SentData(string? message) : base(message) { }
 
     /// <summary>
     /// Initializes a new instance of the SendData class with a message indicating 
@@ -27,13 +20,5 @@ public class SentData : Data
     /// </summary>
     /// <param name="message">The message containing the data that was sent.</param>
     /// <param name="innerData">An optional nested Data object containing additional information.</param>
-    public SentData(string message, Data innerData) : base(message, innerData) { }
-
-    /// <summary>
-    /// Initializes a new instance of the SendData class with an exception and nested data 
-    /// for a failed data transmission operation.
-    /// </summary>
-    /// <param name="exception">The exception object representing the error that occurred.</param>
-    /// <param name="innerData">An optional nested Data object containing additional information (related to the error).</param>
-    public SentData(Exception exception, Data innerData) : base(exception, innerData) { }
+    public SentData(string? message, Data innerData) : base(message, innerData) { }
 }

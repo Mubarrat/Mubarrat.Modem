@@ -5,7 +5,7 @@
 /// Provides synchronous and asynchronous methods for managing the port state,
 /// discarding buffers, and potentially additional communication-specific operations.
 /// </summary>
-public interface ISerialPort : ISyncSerialPort, IAsyncSerialPort
+public interface ISerialPort : ISyncSerialPort, IAsyncSerialPort, IEquatable<ISerialPort>
 {
     /// <summary>
     /// Gets a boolean value indicating whether the serial port is currently open.

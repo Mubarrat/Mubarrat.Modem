@@ -5,7 +5,7 @@
 /// Provides synchronous methods for managing the port state, discarding buffers,
 /// and potentially additional communication-specific operations.
 /// </summary>
-public interface ISyncSerialPort : IDisposable
+public interface ISyncSerialPort : IDisposable, IEquatable<ISyncSerialPort>
 {
     /// <summary>
     /// Opens the serial port for communication.
