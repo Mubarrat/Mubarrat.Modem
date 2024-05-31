@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Mubarrat.Modem.Commands.AtCommand">
+    <Position X="11.25" Y="13.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAEAAACBAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Commands\AtCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Mubarrat.Modem.Commands.AtCommands" Collapsed="true">
+    <Position X="12.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\AtCommands.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mubarrat.Modem.Commands.AtExecuteCommand">
+    <Position X="14.75" Y="16.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Commands\AtExecuteCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mubarrat.Modem.Commands.AtReadCommand">
+    <Position X="10" Y="16.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Commands\AtReadCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mubarrat.Modem.Commands.AtSetCommand">
+    <Position X="12.5" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAACAAAAAAAAA=</HashCode>
+      <FileName>Commands\AtSetCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mubarrat.Modem.Commands.AtTestCommand">
+    <Position X="7.75" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Commands\AtTestCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mubarrat.Modem.CommunicationPort" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IiIAwBAAEKAQIgAAkAAAAASQCAwEAAiAAFAEAACAAgA=</HashCode>
+      <FileName>CommunicationPort.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Mubarrat.Modem.Data">
+    <Position X="3" Y="14.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Data.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Mubarrat.Modem.SentData">
+    <Position X="1.5" Y="17.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SentData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mubarrat.Modem.ReceivedData">
+    <Position X="4.25" Y="17.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ReceivedData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mubarrat.Modem.Ports" Collapsed="true">
+    <Position X="12.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
+      <FileName>Ports.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Mubarrat.Modem.Commands.IAtCommand" Collapsed="true">
+    <Position X="12.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\IAtCommand.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.ISyncSerialPort">
+    <Position X="0.5" Y="3.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAIAAAEAAAAAAAAAQAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>ISyncSerialPort.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.IAsyncSerialPort">
+    <Position X="3.5" Y="3.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AgIAAAAAEAAAAAAAAAAAAAAAAAAAAACAAEAAAAAAAAA=</HashCode>
+      <FileName>IAsyncSerialPort.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.ISerialPort">
+    <Position X="2.5" Y="6.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ISerialPort.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.ISyncCommunicationPort">
+    <Position X="9" Y="6.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AiIAQAAAEIAAAAAAAAAAAACAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ISyncCommunicationPort.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.IAsyncCommunicationPort">
+    <Position X="5.75" Y="6.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAQAAAAAAAAAAQQCAAAAAAAAAAEAAAAAgA=</HashCode>
+      <FileName>IAsyncCommunicationPort.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.ICommunicationPort" Collapsed="true">
+    <Position X="2.25" Y="10" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ICommunicationPort.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.ISyncAtCommandPort">
+    <Position X="10" Y="10" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAQAAAEAAAAACAAAAAQAAAA=</HashCode>
+      <FileName>ISyncAtCommandPort.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.IAsyncAtCommandPort">
+    <Position X="5.5" Y="10" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AQBAAAAAAAAAAACAAAAAAAEAAAAAACAQAAAAAAAAAAA=</HashCode>
+      <FileName>IAsyncAtCommandPort.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.IAtCommandPort" Collapsed="true">
+    <Position X="4.25" Y="13.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IAtCommandPort.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mubarrat.Modem.IData" Collapsed="true">
+    <Position X="14" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>IData.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
