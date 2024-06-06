@@ -7,6 +7,12 @@
 public class AtCommands : List<AtCommand>
 {
     /// <summary>
+    /// Initializes a new instance of the AtCommands class with an initial array of AtCommand objects.
+    /// </summary>
+    /// <param name="collection">An array containing <see cref="AtCommand"/> objects to be added to the list.</param>
+    public AtCommands(params AtCommand[] collection) : base(collection) { }
+
+    /// <summary>
     /// Initializes a new instance of the AtCommands class with an initial collection of AtCommand objects.
     /// </summary>
     /// <param name="collection">An IEnumerable collection containing <see cref="AtCommand"/> objects to be added to the list.</param>

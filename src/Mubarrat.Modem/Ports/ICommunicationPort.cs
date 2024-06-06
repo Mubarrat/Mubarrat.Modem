@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Ports;
 
 /// <summary>
 /// Defines an interface for advanced communication port operations on top of the basic <see cref="ISerialPort" /> functionality.

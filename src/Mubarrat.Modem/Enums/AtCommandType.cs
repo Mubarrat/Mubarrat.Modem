@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Enums;
 
 public enum AtCommandType
 {

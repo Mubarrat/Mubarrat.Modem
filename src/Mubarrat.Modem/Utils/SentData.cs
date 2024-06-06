@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Utils;
 
 /// <summary>
 /// Represents the outcome of a data sending operation.

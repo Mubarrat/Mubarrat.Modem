@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Ports;
 
 /// <summary>
 /// Defines an interface for interacting with a serial port for modem communication.

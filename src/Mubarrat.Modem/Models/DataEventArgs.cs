@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Models;
 
 /// <summary>
 /// This class holds arguments for data related events in the <see cref="CommunicationPort"/> class.

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using static System.Environment;
 
-namespace Mubarrat.Modem;
+namespace Mubarrat.Modem.Ports;
 
 /// <summary>
 /// This class provides functionality to manage communication through a serial port for sending and receiving data.

@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Ports;
 
 /// <summary>
 /// This class provides an observable communication pattern for a cellular modem.
@@ -32,7 +32,7 @@ public class ObservableCommunicationPort : CommunicationPort
     /// </summary>
     private void CheckingData()
     {
-        while (port.IsOpen && port.BytesToRead == 0);
+        while (port.IsOpen && port.BytesToRead == 0) ;
         int prevBytes = port.BytesToRead - 1;
         while (port.IsOpen && prevBytes != port.BytesToRead)
         {

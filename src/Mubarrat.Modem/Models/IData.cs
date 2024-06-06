@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Models;
 
 /// <summary>
 /// Defines the base interface for representing the outcome of communication operations.

@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Ports;
 
 /// <summary>
 /// This interface defines synchronous and asynchronous methods for interacting with a modem using AT commands.

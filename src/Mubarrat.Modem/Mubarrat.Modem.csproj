@@ -10,21 +10,25 @@
 	<EnableNETAnalyzers>True</EnableNETAnalyzers>
 	<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 	<AssemblyOriginatorKeyFile>sgKey.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	<GenerateDocumentationFile>False</GenerateDocumentationFile>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Using Include="Mubarrat.Modem" />
+    <Using Include="Mubarrat.Modem.Commands" />
+    <Using Include="Mubarrat.Modem.Delegates" />
+    <Using Include="Mubarrat.Modem.Enums" />
+    <Using Include="Mubarrat.Modem.Models" />
+    <Using Include="Mubarrat.Modem.Ports" />
+    <Using Include="Mubarrat.Modem.Utils" />
     <Using Include="System.IO.Ports" />
   </ItemGroup>
 

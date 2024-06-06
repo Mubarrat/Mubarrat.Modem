@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Delegates;
 
 /// <summary>
 ///	Delegate used to handle data events (sending or receiving) raised by the <see cref="CommunicationPort"/> class.

@@ -7,16 +7,30 @@
 public class AtSetCommand : AtCommand
 {
     /// <summary>
-    /// Initializes a new instance of the AtSetCommand class with the specified command string and optional data.
+    /// Initializes a new instance of the AtSetCommand class with the specified command string and data.
     /// </summary>
     /// <param name="command">The raw AT command string for setting a value.</param>
-    /// <param name="data">Optional data values to be set with the command (variable number of strings using params keyword).</param>
-    public AtSetCommand(string command, params DataValue[] data) : base(command) => Data = data;
+    /// <param name="data">Data values to be set with the command (variable number of strings using params keyword).</param>
+    public AtSetCommand(string command, params object[] data) : base(command) => Data = [ .. data! ];
+
+    /// <summary>
+    /// Initializes a new instance of the AtSetCommand class with the specified command string and data.
+    /// </summary>
+    /// <param name="command">The raw AT command string for setting a value.</param>
+    /// <param name="data">Data values to be set with the command (variable number of strings using params keyword).</param>
+    public AtSetCommand(string command, IEnumerable<object> data) : base(command) => Data = [ .. data! ];
 
     /// <summary>
     /// Gets or sets the optional data values associated with the AT command for setting.
     /// </summary>
-    public DataValue[] Data { get; set; }
+    public IEnumerable<object> Data { get; }
 
-    protected override string Suffix => $"={string.Join(",", (IEnumerable<DataValue>)Data)}";
+    protected override string Suffix => $"={string.Join(",", Data.Select(x => x == null
+            ? ""
+            : @$"""{x.ToString()
+            .Replace("\\", "\\\\")
+            .Replace("\"", "\\\"")
+            .Replace("\n", "\\n")
+            .Replace("\r", "\\r")
+            .Replace("\t", "\\t")}"""))}";
 }

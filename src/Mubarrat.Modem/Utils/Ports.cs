@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Utils;
 
 /// <summary>
 /// This class provides static methods for accessing information about available serial ports.

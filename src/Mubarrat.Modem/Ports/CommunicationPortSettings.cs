@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Ports;
 
 /// <summary>
 /// A struct provides a way to configure options for <see cref="CommunicationPort"/>.

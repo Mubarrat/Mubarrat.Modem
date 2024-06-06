@@ -1,4 +1,4 @@
-﻿namespace Mubarrat.Modem;
+﻿namespace Mubarrat.Modem.Enums;
 
 /// <summary>
 /// Enumeration indicating the direction of the data (received or sent).

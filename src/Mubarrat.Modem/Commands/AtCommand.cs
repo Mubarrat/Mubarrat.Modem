@@ -40,7 +40,7 @@ public abstract class AtCommand : IAtCommand
     /// <param name="parameters">If you set <paramref name="atCommandType"/> = <see cref="AtCommandType.Set"/>, it will be defined. Otherwise ignored.</param>
     /// <returns>Returns the new instance of <see cref="AtCommand"/> that was created.</returns>
     /// <exception cref="ArgumentException">Thrown if <paramref name="atCommandType"/> isn't valid.</exception>
-    public static AtCommand CreateInstance(AtCommandType atCommandType, string command, params DataValue[] parameters) => atCommandType switch
+    public static AtCommand Create(AtCommandType atCommandType, string command, params object[] parameters) => atCommandType switch
     {
         AtCommandType.Test => new AtTestCommand(command),
         AtCommandType.Read => new AtReadCommand(command),
